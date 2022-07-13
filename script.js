@@ -61,63 +61,20 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-// LECTURES
+const displayMovements = function(movements) {
+  containerMovements.innerHTML = '';
 
-// const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+  movements.forEach(function(mov, i) {
+    const type = mov > 0 ? 'deposit' : 'withdrawal';
 
-/////////////////////////////////////////////////
-// at method
-const arr = [23, 11, 64];
-console.log(arr[0]);
-console.log(arr.at(0));
+    const html = `
+    <div class="movements__row">
+      <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
+      <div class="movements__value">${mov}</div>
+    </div>
+    `;
 
-// Get the last element of an array without knowing the length
-console.log(arr[arr.length - 1]);
-console.log(arr.slice(-1)[0]);
-console.log(arr.at(-1));
-
-console.log('jonas'.at(0));
-
-// forEach method
-
-const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
-
-for(const [i, movement] of movements.entries()) {
-  if(movement > 0) {
-    console.log(`Movement ${i + 1}: You deposited ${movement}`);
-  } else {
-    console.log(`Movement ${i + 1}: You withdrew ${Math.abs(movement)}`);
-  }
-}
-
-console.log('--------FOREACH METHOD---------');
-
-// using forEach method
-movements.forEach(function(movement, index, array) {
-  if(movement > 0) {
-    console.log(`Movement ${index + 1}: You deposited ${movement}`);
-  } else {
-    console.log(`Movement ${index + 1}: You withdrew ${Math.abs(movement)}`);
-  }
-});
-
-// forEach with Maps and Sets
-
-const currencies = new Map([
-  ['USD', 'United States dollar'],
-  ['EUR', 'Euro'],
-  ['GBP', 'Pound sterling'],
-]);
-
-currencies.forEach(function(value, key, map) {
-  console.log(`${key}: ${value}`);
-});
-
-// Set
-const currenciesUnique = new Set(['USD', 'GBP', 'USD', 'EUR', 'EUR']);
-console.log(currenciesUnique);
-currenciesUnique.forEach(function(value, key, map) {
-  console.log(`${key}: ${value}`);
-})
+    containerMovements.insertAdjacentHTML('afterbegin', html);
+  });
+};
+displayMovements(account1.movements);
