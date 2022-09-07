@@ -132,7 +132,11 @@ const displayMovements = function (acc, sort = false) {
 
 const calcDisplayBalance = function (account) {
   account.balance = account.movements.reduce((acc, mov) => acc + mov, 0);
-  labelBalance.textContent = formatCur(account.balance, account.locale, account.currency);
+  labelBalance.textContent = formatCur(
+    account.balance,
+    account.locale,
+    account.currency
+  );
 };
 
 //  Calculating and Displaying Summary
@@ -146,7 +150,11 @@ const calcDisplaySummary = function (account) {
   const out = account.movements
     .filter(mov => mov < 0)
     .reduce((acc, mov) => acc + mov, 0);
-  labelSumOut.textContent = formatCur(Math.abs(out), account.locale, account.currency);
+  labelSumOut.textContent = formatCur(
+    Math.abs(out),
+    account.locale,
+    account.currency
+  );
 
   const interest = account.movements
     .filter(mov => mov > 0)
@@ -155,7 +163,11 @@ const calcDisplaySummary = function (account) {
       return int >= 1;
     })
     .reduce((acc, int) => acc + int, 0);
-  labelSumInterest.textContent = formatCur(interest, account.locale, account.currency);
+  labelSumInterest.textContent = formatCur(
+    interest,
+    account.locale,
+    account.currency
+  );
 };
 
 // Computing Usernames
@@ -181,11 +193,41 @@ const updateUI = function (acc) {
   calcDisplaySummary(acc);
 };
 
+// Logout timer
+const startLogOutTimer = function() {
+  const tick = function() {
+    const min = String(Math.trunc(time / 60)).padStart(2, 0);
+    const sec = String(time % 60).padStart(2, 0);
+
+    // In each call print the remaining time to UI
+    labelTimer.textContent = `${min} : ${sec}`;
+
+    // When 0 seconds stop timer and log out the user
+    if(time === 0) {
+      clearInterval(timer);
+      labelWelcome.textContent = 'Log in to get started';
+      containerApp.style.opacity = 0;
+    }
+
+    // Decrease 1 sec
+    time--;
+  }
+
+  // Set Time to 5 min
+  let time = 120;
+
+  // Call the timer every second
+  tick();
+  const timer = setInterval(tick, 1000);
+
+  return timer;
+}
+
 // Event handler
 
 // Implementing Login
 
-let currentAccount;
+let currentAccount, timer;
 
 btnLogin.addEventListener('click', function (event) {
   // Prevent form from submitting
@@ -227,6 +269,10 @@ btnLogin.addEventListener('click', function (event) {
     inputLoginUsername.value = inputLoginPin.value = '';
     inputLoginPin.blur();
 
+    // Logout Timer
+    if(timer) clearInterval(timer);
+    timer = startLogOutTimer();
+
     // Update UI
     updateUI(currentAccount);
   }
@@ -260,6 +306,10 @@ btnTransfer.addEventListener('click', function (e) {
   }
   // Update UI
   updateUI(currentAccount);
+
+  // Reset the timer
+  clearInterval(timer);
+  timer = startLogOutTimer();
 });
 
 // Requesting a loan
@@ -268,15 +318,21 @@ btnLoan.addEventListener('click', function (e) {
   e.preventDefault();
   const amount = Math.floor(inputLoanAmount.value);
   if (amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)) {
-    // Add movements
-    currentAccount.movements.push(amount);
+    setTimeout(function () {
+      // Add movements
+      currentAccount.movements.push(amount);
 
-    // Add loan date
-    currentAccount.movementsDates.push(new Date().toISOString());
+      // Add loan date
+      currentAccount.movementsDates.push(new Date().toISOString());
 
-    // Update UI
-    updateUI(currentAccount);
+      // Update UI
+      updateUI(currentAccount);
+    }, 3000);
   }
+
+  // Reset the timer
+  clearInterval(timer);
+  timer = startLogOutTimer();
 
   // Clear the input fields
   inputLoanAmount.value = '';
@@ -316,9 +372,9 @@ btnSort.addEventListener('click', function (e) {
 });
 
 // Fake always logged in
-currentAccount = account1;
-updateUI(currentAccount);
-containerApp.style.opacity = 100;
+// currentAccount = account1;
+// updateUI(currentAccount);
+// containerApp.style.opacity = 100;
 
 ////////////////////////////// LECTURES
 
@@ -330,7 +386,7 @@ containerApp.style.opacity = 100;
 
 // const days1 = calcDaysPassed(new Date(2022, 9, 21), new Date(2023, 10, 25)); // 10
 // console.log(days1);
-
+/*
 const num = 3457898.12;
 
 const options = {
@@ -350,3 +406,26 @@ console.log(
   'US:          ',
   new Intl.NumberFormat('en-US', options).format(num)
 );
+*/
+
+// setTimeout and setInterval
+// setTimeout
+/*
+const ingredients = ['olives', 'spinach'];
+
+const pizzaTimer = setTimeout(
+  (ing1, ing2) => console.log(`Here's your pizza with ${ing1} and ${ing2}`),
+  3000,
+  ...ingredients
+);
+
+console.log('Waiting...');
+
+if (ingredients.includes('spinach')) clearTimeout(pizzaTimer);
+
+// setInterval
+setInterval(function() {
+  const now = new Date();
+  console.log(now);
+}, 1000);
+*/
